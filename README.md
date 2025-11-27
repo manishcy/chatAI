@@ -1,6 +1,6 @@
 # AI Assistant Client
 
-A beautiful, production-ready AI assistant client built with React, TypeScript, and Tailwind CSS. This application provides an intuitive interface for interacting with various large language models through a modern chat interface.
+A beautiful, production-ready AI assistant client built with React, TypeScript, and Tailwind CSS. This application provides an intuitive interface for interacting with various large language models through a modern chat interface develop.
 
 ## 🌟 Features
 
