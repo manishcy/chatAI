@@ -21,7 +21,7 @@ export const ChatArea: React.FC<ChatAreaProps> = ({ messages, isLoading }) => {
           <div className="text-6xl mb-4">🤖</div>
           <h3 className="text-xl font-semibold mb-2">Welcome to AI Assistant</h3>
           <p className="text-sm">
-            Select a model above and start a conversation. Ask me anything!
+            Select a model above and start a conversation. Ask me  anything!
           </p>
         </div>
       </div>
