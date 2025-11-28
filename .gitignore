@@ -23,3 +23,6 @@ dist-ssr
 *.sln
 *.sw?
 .env
+
+# Prevent accidental commit of test/junk files
+abc.txt
