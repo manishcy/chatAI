@@ -26,3 +26,4 @@ dist-ssr
 
 # Prevent accidental commit of test/junk files
 abc.txt
+demo.txt
