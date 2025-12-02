@@ -1,7 +1,7 @@
 reviews:
   auto_review: true
   auto_review_on:
-    - "master"
+    - "KAN-2_login"
 
   # Hide the 'Review skipped' status message
   review_status: false
