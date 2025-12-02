@@ -2,7 +2,17 @@ reviews:
   auto_review: true
   auto_review_on:
     - "master"
-    - "dev"
 
   # Hide the 'Review skipped' status message
   review_status: false
+
+integrations:
+  jira:
+    enabled: true
+    base_url: "https://manish-kumar.atlassian.net"
+    email: "manishkumar@cybage.com"     
+    api_token: "${JIRA_API_TOKEN}" 
+    project_keys:
+      - "KAN"      
+    issue_patterns:
+      - "[A-Z]+-[0-9]+"
