@@ -3,5 +3,4 @@ reviews:
     enabled: true
     base_branches:
       - "dev"
-
-review_status: false
+  review_status: false
