@@ -80,7 +80,7 @@ function App() {
               <ChatInput
                 onSendMessage={sendMessage}
                 disabled={isLoading || !selectedModel}
-                placeholder={selectedModel ? "Ask me anything....." : "Select a model to start chatting"}
+                placeholder={selectedModel ? "Ask me anything..." : "Select a model to start chatting"}
               />
             </div>
           </div>

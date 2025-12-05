@@ -1,7 +1,8 @@
 reviews:
-  auto_review: true
-  auto_review_on:
-    - "dev"
+  auto_review:
+    enabled: true
+    base_branches:
+      - "dev"
 
   # Hide the 'Review skipped' status message
   review_status: false
