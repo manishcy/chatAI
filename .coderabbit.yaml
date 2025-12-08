@@ -1,0 +1,24 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+
+# Enable Jira integration in chat
+chat:
+  integrations:
+    jira:
+      usage: enabled
+
+# Configure knowledge base for Jira
+knowledge_base:
+  jira:
+    usage: enabled
+    project_keys:
+      - "KAN"
+
+# Auto review settings (optional - include if you want auto reviews)
+reviews:
+  auto_review:
+    enabled: true
+    auto_incremental_review: true
+    base_branches:
+      - "master"
+      - "dev"
+  review_status: false
