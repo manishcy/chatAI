@@ -71,13 +71,14 @@ function App() {
             )}
           </div>
 
+
           {/* Chat Area */}
           <div className="flex-1 flex flex-col">
             <ChatArea messages={messages} isLoading={isLoading} />
             {/* Input Area */}
             <div className="p-4 border-t border-white/10">
               <ChatInput
-                onSendMessage={sendMessages}
+                onSendMessage={sendMessage}
                 disabled={isLoading || !selectedModel}
                 placeholder={selectedModel ? "Ask me anything..." : "Select a model to start chatting"}
               />
