@@ -1,1 +1,16 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+
+reviews:
+  auto_review:
+    enabled: true
+    auto_incremental_review: true
+    base_branches:
+      - "master"
+      - "dev"
+  review_status: false
+
+knowledge_base:
+  jira:
+    project_keys:
+      - "KAN"
 
