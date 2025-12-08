@@ -1,6 +1,18 @@
-# reviews:
-#   auto_review:
-#     enabled: true
-#     base_branches:
-#       - "dev"
-#   review_status: false
+reviews:
+  auto_review: true
+  auto_review_on:
+    - "master"
+    - "dev"
+
+review_status: false
+
+integrations:
+  jira:
+    enabled: true
+    base_url: "${JIRA_BASE_URL}"
+    email: "${JIRA_EMAIL}"
+    api_token: "${JIRA_API_TOKEN}"
+    project_keys:
+      - "KAN"
+    issue_patterns:
+      - "[A-Z]+-[0-9]+"
