@@ -1,6 +1,6 @@
-reviews:
-  auto_review:
-    enabled: true
-    base_branches:
-      - "dev"
-  review_status: false
+# reviews:
+#   auto_review:
+#     enabled: true
+#     base_branches:
+#       - "dev"
+#   review_status: false
