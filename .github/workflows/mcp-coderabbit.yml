@@ -1,39 +1,61 @@
-name: MCP + CodeRabbit Integration
+name: PR + MCP Analysis
 
 on:
   pull_request:
+    types: [opened, reopened, synchronize]
     branches:
       - dev
       - master
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
 
 jobs:
   run-mcp-analysis:
     runs-on: ubuntu-latest
 
     steps:
+      # Checkout PR code
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Install MCP server dependencies
-        run: npm install
+      # Install Node dependencies (if package.json exists)
+      - name: Install dependencies
+        run: |
+          if [ -f "package.json" ]; then
+            npm install
+          fi
 
-      - name: Run MCP server analysis
-        run: node mcp-server.js > mcp-output.json
+      # Run MCP server and save output
+      - name: Run MCP Analysis
+        id: mcp
+        run: |
+          echo "Running MCP..."
+          OUTPUT=$(node mcp-server.js)
+          echo "$OUTPUT" > mcp-output.json
 
-      - name: Upload MCP result to PR
+          # Escape MCP output for GitHub comment
+          esc_output="${OUTPUT//'%'/'%25'}"
+          esc_output="${esc_output//$'\n'/'%0A'}"
+          esc_output="${esc_output//$'\r'/'%0D'}"
+
+          echo "result=$esc_output" >> $GITHUB_OUTPUT
+
+      # Comment the MCP output on PR
+      - name: Comment on Pull Request
         uses: actions/github-script@v6
         with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const fs = require('fs');
-            const result = fs.readFileSync('mcp-output.json', 'utf8');
-
             const prNumber = context.payload.pull_request.number;
+            const output = `${{ steps.mcp.outputs.result }}`;
 
             await github.rest.issues.createComment({
-              issue_number: prNumber,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: `### 🧠 MCP Server Output\n\`\`\`\n${result}\n\`\`\``
+              issue_number: prNumber,
+              body: `### 🤖 MCP Analysis Output\n\n\`\`\`json\n${output}\n\`\`\``
             });
 
-            console.log("Comment posted to PR #" + prNumber);
