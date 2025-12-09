@@ -1,8 +1,12 @@
-name: PR + MCP Analysis
+name: Push + PR MCP Analysis
 
 on:
+  push:
+    branches:
+      - dev
+      - master
+
   pull_request:
-    types: [opened, reopened, synchronize]
     branches:
       - dev
       - master
@@ -17,18 +21,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout PR code
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Install Node dependencies (if package.json exists)
       - name: Install dependencies
         run: |
           if [ -f "package.json" ]; then
             npm install
           fi
 
-      # Run MCP server and save output
       - name: Run MCP Analysis
         id: mcp
         run: |
@@ -36,15 +37,14 @@ jobs:
           OUTPUT=$(node mcp-server.js)
           echo "$OUTPUT" > mcp-output.json
 
-          # Escape MCP output for GitHub comment
+          # Escape output for GitHub
           esc_output="${OUTPUT//'%'/'%25'}"
           esc_output="${esc_output//$'\n'/'%0A'}"
           esc_output="${esc_output//$'\r'/'%0D'}"
-
           echo "result=$esc_output" >> $GITHUB_OUTPUT
 
-      # Comment the MCP output on PR
       - name: Comment on Pull Request
+        if: ${{ github.event_name == 'pull_request' }}
         uses: actions/github-script@v6
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -58,4 +58,3 @@ jobs:
               issue_number: prNumber,
               body: `### 🤖 MCP Analysis Output\n\n\`\`\`json\n${output}\n\`\`\``
             });
-
