@@ -1,7 +1,7 @@
 name: MCP + CodeRabbit Integration
 
 on:
-  push:
+  pull_request:
     branches:
       - dev
       - master
@@ -20,29 +20,14 @@ jobs:
       - name: Run MCP server analysis
         run: node mcp-server.js > mcp-output.json
 
-      - name: Upload MCP result to PR (if any)
+      - name: Upload MCP result to PR
         uses: actions/github-script@v6
         with:
           script: |
-            const fs = require("fs");
-            const result = fs.readFileSync("mcp-output.json", "utf8");
+            const fs = require('fs');
+            const result = fs.readFileSync('mcp-output.json', 'utf8');
 
-            // Extract branch name (refs/heads/dev → dev)
-            const branchName = context.ref.replace("refs/heads/", "");
-
-            // Find PR linked to this branch
-            const { data: prs } = await github.rest.pulls.list({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              head: `${context.repo.owner}:${branchName}`
-            });
-
-            if (prs.length === 0) {
-              console.log("No PR found for this push. Skipping comment.");
-              return;
-            }
-
-            const prNumber = prs[0].number;
+            const prNumber = context.payload.pull_request.number;
 
             await github.rest.issues.createComment({
               issue_number: prNumber,
@@ -51,4 +36,4 @@ jobs:
               body: `### 🧠 MCP Server Output\n\`\`\`\n${result}\n\`\`\``
             });
 
-            console.log("Comment added to PR #" + prNumber);
+            console.log("Comment posted to PR #" + prNumber);
