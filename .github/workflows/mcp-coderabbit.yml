@@ -20,18 +20,35 @@ jobs:
       - name: Run MCP server analysis
         run: node mcp-server.js > mcp-output.json
 
-      - name: Upload MCP result to PR
+      - name: Upload MCP result to PR (if any)
         uses: actions/github-script@v6
         with:
           script: |
-            const fs = require('fs');
-            const result = fs.readFileSync('mcp-output.json', 'utf8');
-            
-            const prNumber = context.payload.pull_request.number;
+            const fs = require("fs");
+            const result = fs.readFileSync("mcp-output.json", "utf8");
 
-            github.rest.issues.createComment({
+            // Extract branch name (refs/heads/dev → dev)
+            const branchName = context.ref.replace("refs/heads/", "");
+
+            // Find PR linked to this branch
+            const { data: prs } = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              head: `${context.repo.owner}:${branchName}`
+            });
+
+            if (prs.length === 0) {
+              console.log("No PR found for this push. Skipping comment.");
+              return;
+            }
+
+            const prNumber = prs[0].number;
+
+            await github.rest.issues.createComment({
               issue_number: prNumber,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: "### 🧠 MCP Server Output\n```\n" + result + "\n```"
+              body: `### 🧠 MCP Server Output\n\`\`\`\n${result}\n\`\`\``
             });
+
+            console.log("Comment added to PR #" + prNumber);
