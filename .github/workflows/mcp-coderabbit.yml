@@ -1,7 +1,7 @@
 name: MCP + CodeRabbit Integration
 
 on:
-  push:
+  pull_request:
     branches:
       - dev
       - master
@@ -9,6 +9,7 @@ on:
 jobs:
   run-mcp-analysis:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -25,8 +26,11 @@ jobs:
           script: |
             const fs = require('fs');
             const result = fs.readFileSync('mcp-output.json', 'utf8');
+            
+            const prNumber = context.payload.pull_request.number;
+
             github.rest.issues.createComment({
-              issue_number: context.issue.number,
+              issue_number: prNumber,
               owner: context.repo.owner,
               repo: context.repo.repo,
               body: "### 🧠 MCP Server Output\n```\n" + result + "\n```"
