@@ -2,8 +2,7 @@ name: PR + MCP Analysis
 
 on:
   pull_request:
-    types: [opened, reopened, synchronize] # Trigger on PR creation, reopen, or new commits
-    # Branch filter removed so it works for all PRs
+    types: [opened, reopened, synchronize]
 
 permissions:
   contents: read
@@ -15,38 +14,65 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Checkout PR code
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # 2️⃣ Install Node dependencies if package.json exists
       - name: Install dependencies
         run: |
           if [ -f "package.json" ]; then
             npm install
           fi
 
-      # 3️⃣ Run MCP server and save output
       - name: Run MCP Analysis
         run: |
           echo "Running MCP..."
           node mcp-server.js > mcp-output.json
 
-      # 4️⃣ Comment the MCP output on PR
-      - name: Comment on Pull Request
+      - name: Comment on Pull Request (with MCP + CodeRabbit)
         uses: actions/github-script@v6
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const fs = require('fs');
+
             const prNumber = context.payload.pull_request.number;
 
-            // Read MCP JSON output from file
-            const output = fs.readFileSync('mcp-output.json', 'utf8');
+            // 1️⃣ Read MCP output
+            const mcpOutput = fs.readFileSync('mcp-output.json', 'utf8');
 
+            // 2️⃣ Fetch ALL existing PR comments (including CodeRabbit)
+            const comments = await github.paginate(
+              github.rest.issues.listComments,
+              {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+              }
+            );
+
+            // Filter comments created by CodeRabbit bot
+            const coderabbitComments = comments
+              .filter(c => c.user && c.user.login.includes("coderabbit"))
+              .map(c => `- ${c.body}`)
+              .join("\n\n");
+
+            // 3️⃣ Build final comment body
+            const finalComment = `
+### 🤖 MCP Analysis Output
+\`\`\`json
+${mcpOutput}
+\`\`\`
+
+---
+
+### 🐰 CodeRabbit Suggestions & Reviews  
+${coderabbitComments || "_No CodeRabbit suggestions found_"}
+`;
+
+            // 4️⃣ Post the combined comment
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: prNumber,
-              body: `### 🤖 MCP Analysis Output\n\n\`\`\`json\n${output}\n\`\`\``
+              body: finalComment
             });
